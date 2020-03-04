@@ -1,7 +1,6 @@
 language: go
 
 go:
-  - "1.13"
   - "1.14"
 
 os:
@@ -20,10 +19,17 @@ env:
     - GO111MODULE=on
     - GOPROXY=https://proxy.golang.org
 
+branches:
+  except:
+    - master
+
 before_install:
   - export BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
   - echo "current branch is ${BRANCH}"
   - ls ${BRANCH} && cd ${BRANCH}
+
+stages:
+  - Tests
 
 jobs:
   include:
