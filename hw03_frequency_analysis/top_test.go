@@ -43,9 +43,30 @@ var text = `Как видите, он  спускается  по  лестни�
 	посидеть у огня и послушать какую-нибудь интересную сказку.
 		В этот вечер...`
 
+const engText = `So this is bear and his name is Fuly. Behind him is nothing interesting and his name is Fuly.
+	So you'll see and hear. I don't now what else to say. But his name is Fuly and this is bear.'`
+
+const shortText = `Погода -8 да, сегодня.`
+
+var nonUtf8Text = string([]byte{0xff, 0xfe, 0xfd, 0x33, 0x3d})
+
 func TestTop10(t *testing.T) {
 	t.Run("no words in empty string", func(t *testing.T) {
 		assert.Len(t, Top10(""), 0)
+	})
+
+	t.Run("english language string", func(t *testing.T) {
+		expected := []string{"is", "and", "his", "name", "Fuly", "So", "this", "bear", "Behind", "him"}
+		assert.ElementsMatch(t, expected, Top10(engText))
+	})
+
+	t.Run("short string", func(t *testing.T) {
+		expected := []string{"Погода", "да", "сегодня"}
+		assert.ElementsMatch(t, expected, Top10(shortText))
+	})
+
+	t.Run("non utf8 string", func(t *testing.T) {
+		assert.Len(t, Top10(nonUtf8Text), 0)
 	})
 
 	t.Run("positive test", func(t *testing.T) {
@@ -53,7 +74,7 @@ func TestTop10(t *testing.T) {
 			expected := []string{"он", "а", "и", "что", "ты", "не", "если", "то", "его", "кристофер", "робин", "в"}
 			assert.Subset(t, expected, Top10(text))
 		} else {
-			expected := []string{"он", "и", "а", "что", "ты", "не", "если", "-", "то", "Кристофер"}
+			expected := []string{"он", "и", "а", "что", "ты", "не", "если", "-", "то", "его"}
 			assert.ElementsMatch(t, expected, Top10(text))
 		}
 	})
