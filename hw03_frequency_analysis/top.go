@@ -1,6 +1,5 @@
 package hw03_frequency_analysis //nolint:golint,stylecheck
 import (
-	"regexp"
 	"sort"
 	"strings"
 	"unicode/utf8"
@@ -22,15 +21,14 @@ func Top10(text string) []string {
 		result      = make([]string, 0, top)
 	)
 
-	re := regexp.MustCompile(`\p{L}+-\p{L}+|\p{L}+| - |\t- |\n- `)
-	words := re.FindAllString(text, -1)
+	//re := regexp.MustCompile(`\p{L}+-\p{L}+|\p{L}+| - |\t- |\n- `)
+	//words := re.FindAllString(text, -1)
+	words := strings.FieldsFunc(text, func(r rune) bool {
+		return strings.ContainsRune("0123456789\t\n\r ", r)
+	})
 
 	if len(words) == 0 {
 		return nil
-	}
-
-	if len(words) < top {
-		top = len(words)
 	}
 
 	for i, v := range words {
@@ -47,6 +45,10 @@ func Top10(text string) []string {
 	sort.SliceStable(uniq, func(i, j int) bool {
 		return wordCounter[uniq[i]] > wordCounter[uniq[j]]
 	})
+
+	if len(uniq) < top {
+		top = len(uniq)
+	}
 
 	result = append(result, uniq[:top]...)
 

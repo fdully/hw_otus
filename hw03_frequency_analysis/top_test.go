@@ -48,6 +48,8 @@ const engText = `So this is bear and his name is Fuly. Behind him is nothing int
 
 const shortText = `Погода -8 да, сегодня.`
 
+const repeatingWordsText = `one, one, one, два два два - - - look!`
+
 var nonUtf8Text = string([]byte{0xff, 0xfe, 0xfd, 0x33, 0x3d})
 
 func TestTop10(t *testing.T) {
@@ -56,13 +58,18 @@ func TestTop10(t *testing.T) {
 	})
 
 	t.Run("english language string", func(t *testing.T) {
-		expected := []string{"is", "and", "his", "name", "Fuly", "So", "this", "bear", "Behind", "him"}
+		expected := []string{"is", "and", "his", "name", "So", "this", "Fuly.", "bear", "Behind", "him"}
 		assert.ElementsMatch(t, expected, Top10(engText))
 	})
 
 	t.Run("short string", func(t *testing.T) {
-		expected := []string{"Погода", "да", "сегодня"}
+		expected := []string{"Погода", "-", "да,", "сегодня."}
 		assert.ElementsMatch(t, expected, Top10(shortText))
+	})
+
+	t.Run("repeating words in text", func(t *testing.T) {
+		expected := []string{"one,", "два", "-", "look!"}
+		assert.ElementsMatch(t, expected, Top10(repeatingWordsText))
 	})
 
 	t.Run("non utf8 string", func(t *testing.T) {
@@ -74,7 +81,7 @@ func TestTop10(t *testing.T) {
 			expected := []string{"он", "а", "и", "что", "ты", "не", "если", "то", "его", "кристофер", "робин", "в"}
 			assert.Subset(t, expected, Top10(text))
 		} else {
-			expected := []string{"он", "и", "а", "что", "ты", "не", "если", "-", "то", "его"}
+			expected := []string{"он", "и", "а", "что", "ты", "не", "если", "-", "то", "Кристофер"}
 			assert.ElementsMatch(t, expected, Top10(text))
 		}
 	})
