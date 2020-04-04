@@ -1,6 +1,7 @@
 package hw04_lru_cache //nolint:golint,stylecheck
 
 import (
+	"fmt"
 	"math/rand"
 	"strconv"
 	"sync"
@@ -51,6 +52,25 @@ func TestCache(t *testing.T) {
 
 	t.Run("purge logic", func(t *testing.T) {
 		// Write me
+		c := NewCache(100)
+		for i := 1; i <= 100; i++ {
+			c.Set(Key(fmt.Sprintf("num%d", i)), i)
+		}
+		val, ok := c.Get("num100")
+		require.True(t, ok)
+		require.Equal(t, val, 100)
+
+		c.Set("num0", 0)
+
+		val, ok = c.Get("num1")
+		require.False(t, ok)
+		require.Equal(t, val, nil)
+
+		c.Clear()
+		val, ok = c.Get("num0")
+		require.False(t, ok)
+		require.Equal(t, val, nil)
+
 	})
 }
 
