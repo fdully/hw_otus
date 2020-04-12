@@ -35,7 +35,7 @@ func Run(tasks []Task, n int, m int) error {
 		go do(taskCh, doneCh, errCh, wg)
 	}
 
-	// passing tasks to channel
+	// passing tasks to task channel
 	wg.Add(one)
 	go passTasksToDo(tasks, taskCh, doneCh, wg)
 

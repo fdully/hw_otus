@@ -62,4 +62,65 @@ func TestRun(t *testing.T) {
 		require.Equal(t, int32(tasksCount), runTasksCount, "not all tasks were completed")
 		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
 	})
+
+	t.Run("0 tasks in slice", func(t *testing.T) {
+		result := Run([]Task{}, 2, 2)
+		require.Nil(t, result)
+	})
+
+	t.Run("0 goroutines to run", func(t *testing.T) {
+		result := Run([]Task{}, 0, 2)
+		require.Nil(t, result)
+	})
+
+	t.Run("more goroutines than tasks were started with no errors from tasks", func(t *testing.T) {
+		tasksCount := 25
+		tasks := make([]Task, 0, tasksCount)
+
+		var runTaskCount int32
+		for i := 0; i < tasksCount; i++ {
+			tasks = append(tasks, func() error {
+				time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)))
+				atomic.AddInt32(&runTaskCount, 1)
+				return nil
+			})
+		}
+
+		workersCount := 50
+		maxErrorsCount := 0
+
+		result := Run(tasks, workersCount, maxErrorsCount)
+		require.Nil(t, result)
+		require.Equal(t, int32(tasksCount), runTaskCount)
+	})
+
+	t.Run("mix of tasks with errors and half without", func(t *testing.T) {
+		tasksErrorCount := 25
+		tasksNoErrorCount := 25
+		tasks := make([]Task, 0, tasksErrorCount+tasksNoErrorCount)
+
+		var runTaskErrorCounter int32
+		var runTaskNoErrorCounter int32
+
+		for i := 0; i < tasksErrorCount; i++ {
+			tasks = append(tasks, func() error {
+				time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)))
+				atomic.AddInt32(&runTaskErrorCounter, 1)
+				return fmt.Errorf("error from task %d", i)
+			})
+			tasks = append(tasks, func() error {
+				time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)))
+				atomic.AddInt32(&runTaskNoErrorCounter, 1)
+				return nil
+			})
+		}
+
+		workersCount := 4
+
+		result := Run(tasks, workersCount, tasksErrorCount+1)
+
+		require.Nil(t, result)
+		require.Equal(t, int32(tasksErrorCount), runTaskErrorCounter)
+		require.Equal(t, int32(tasksNoErrorCount), runTaskNoErrorCounter)
+	})
 }
