@@ -9,102 +9,90 @@ var ErrErrorsLimitExceeded = errors.New("errors limit exceeded")
 
 type Task func() error
 
-// Run starts tasks in n goroutines and stops its work when receiving m errors from tasks
+// Run tasks in n goroutines and stops its work when receiving m errors from tasks
 func Run(tasks []Task, n int, m int) error {
 	// Place your code here
-	const (
-		one = 1
-	)
 	if len(tasks) == 0 {
 		return nil
 	}
-	if n < one {
+	if n < 1 { //nolint:gomnd
 		return nil
 	}
 
 	var (
-		taskCh     = make(chan Task)
-		errCh      = make(chan error)
-		wg         = &sync.WaitGroup{}
-		errCounter int
-		doneCh     = make(chan struct{})
+		taskCh      = make(chan Task)
+		errCh       = make(chan error)
+		wg          = &sync.WaitGroup{}
+		errCounter  int
+		doneCh      = make(chan struct{})
+		resultError error
 	)
 
+	wg.Add(n)
+	// start n workers
 	for i := 0; i < n; i++ {
-		wg.Add(one)
 		go do(taskCh, doneCh, errCh, wg)
 	}
 
-	// passing tasks to task channel
-	wg.Add(one)
-	go passTasksToDo(tasks, taskCh, doneCh, wg)
+	// queueing tasks for workers
+	wg.Add(1) //nolint:gomnd
+	go queueTasksToDo(tasks, taskCh, doneCh, wg)
 
 	// processing errors from tasks
-	for i := 0; i < len(tasks); i++ {
-		err := <-errCh
-		if err != nil {
-			errCounter++
-			if errCounter >= m {
-				close(doneCh)
-				wg.Wait()
-				return ErrErrorsLimitExceeded
-			}
-		}
-	}
-
-	// exiting all goroutines
-	close(doneCh)
+	wg.Add(1) //nolint:gomnd
+	go processErrorsFromTasks(errCh, doneCh, m, errCounter, &resultError, wg)
 
 	wg.Wait()
-
-	return nil
+	return resultError
 }
 
-func passTasksToDo(tasks []Task, taskCh chan Task, doneCh chan struct{}, wg *sync.WaitGroup) {
+func processErrorsFromTasks(errCh chan error, doneCh chan struct{}, maxErrorsAllowed int, errCounter int, resultError *error, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for {
+		select {
+		case err := <-errCh:
+			if err != nil {
+				errCounter++
+				if errCounter >= maxErrorsAllowed {
+					*resultError = ErrErrorsLimitExceeded
+					close(doneCh)
+					return
+				}
+			}
+		case <-doneCh:
+			return
+		}
+	}
+}
+
+func queueTasksToDo(tasks []Task, taskCh chan Task, doneCh chan struct{}, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for _, v := range tasks {
 		select {
-		case _, ok := <-doneCh:
-			if !ok {
-				return
-			}
-		default:
-		}
-		select {
 		case taskCh <- v:
-		case _, ok := <-doneCh:
-			if !ok {
-				return
-			}
+		case <-doneCh:
+			return
 		}
 	}
+	close(doneCh)
 }
 
 func do(taskCh chan Task, doneCh chan struct{}, errCh chan error, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for {
 		select {
-		case _, ok := <-doneCh:
-			if !ok {
-				return
-			}
-		default:
-		}
-
-		select {
 		case task := <-taskCh:
-			select {
 			// run task
-			case errCh <- task():
-			case _, ok := <-doneCh:
-				if !ok {
+			err := task()
+			if err != nil {
+				select {
+				case errCh <- err:
+				case <-doneCh:
 					return
 				}
 			}
-		case _, ok := <-doneCh:
-			if !ok {
-				return
-			}
+		case <-doneCh:
+			return
 		}
 	}
 }
