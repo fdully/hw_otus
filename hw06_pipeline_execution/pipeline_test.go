@@ -2,6 +2,7 @@ package hw06_pipeline_execution //nolint:golint,stylecheck
 
 import (
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -89,5 +90,53 @@ func TestPipeline(t *testing.T) {
 
 		require.Len(t, result, 0)
 		require.Less(t, int64(elapsed), int64(abortDur)+int64(fault))
+	})
+
+	t.Run("nothing to execute", func(t *testing.T) {
+		in := make(Bi)
+		require.Nil(t, ExecutePipeline(in, nil, []Stage{}...))
+	})
+
+	t.Run("capitalize words", func(t *testing.T) {
+		in := make(Bi)
+		data := []string{"Hi", " ", "my", " ", "друг", "!"}
+
+		stages := []Stage{
+			g("capitalize", func(v I) I {
+				str, ok := v.(string)
+				if !ok {
+					return nil
+				}
+				return strings.ToUpper(str)
+			}),
+			g("dummy", func(v I) I {
+				return v
+			}),
+			g("remove spaces", func(v I) I {
+				str, ok := v.(string)
+				if !ok {
+					return nil
+				}
+				if str == " " {
+					return nil
+				}
+				return v
+			}),
+		}
+		go func() {
+			for _, v := range data {
+				in <- v
+			}
+			close(in)
+		}()
+
+		result := make([]string, 0, 3)
+		for s := range ExecutePipeline(in, nil, stages...) {
+			str, ok := s.(string)
+			if ok {
+				result = append(result, str)
+			}
+		}
+		require.Equal(t, result, []string{"HI", "MY", "ДРУГ", "!"})
 	})
 }
