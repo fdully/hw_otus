@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"log"
+	"os"
 )
 
 var (
@@ -19,4 +21,12 @@ func init() {
 func main() {
 	flag.Parse()
 	// Place your code here
+	if from == "" || to == "" {
+		flag.Usage()
+		os.Exit(1) //nolint:gomnd
+	}
+
+	if err := Copy(from, to, offset, limit); err != nil {
+		log.Fatal(err)
+	}
 }
