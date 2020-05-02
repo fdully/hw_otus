@@ -15,28 +15,34 @@ func TestCopy(t *testing.T) {
 
 	tmpfile, err := ioutil.TempFile("", "tempfile")
 	if err != nil {
-		require.Errorf(t, err, "can't open temp file")
+		require.Fail(t, "can't open temp file", err)
 	}
 
 	defer func() {
 		if err := os.Remove(tmpfile.Name()); err != nil {
-			require.Errorf(t, err, "can't remove test file")
+			require.Fail(t, "can't remove test file", err)
 		}
 		if err := os.Remove(outFileName); err != nil {
-			require.Errorf(t, err, "can't remove test file")
+			require.Fail(t, "can't remove test file", err)
 		}
 	}() // clean up
 
 	if _, err := tmpfile.Write(content); err != nil {
-		require.Errorf(t, err, "can't write to temp file")
+		require.Fail(t, "can't write to temp file", err)
 	}
 	if err := tmpfile.Close(); err != nil {
-		require.Errorf(t, err, "can't close temp file")
+		require.Fail(t, "can't close temp file", err)
 	}
 
 	t.Run("plain copy", func(t *testing.T) {
 		err = Copy(tmpfile.Name(), outFileName, 0, 0)
 		require.Nil(t, err)
+
+		copyResult, err := ioutil.ReadFile(outFileName)
+		if err != nil {
+			require.Fail(t, "can't open copied file", err)
+		}
+		require.Equal(t, content, copyResult)
 	})
 
 	t.Run("offset error", func(t *testing.T) {
