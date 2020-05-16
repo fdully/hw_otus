@@ -9,7 +9,7 @@ import (
 
 const IncorrectCommand = -1
 
-// RunCmd runs a command + arguments (cmd) with environment variables from env
+// RunCmd runs a command + arguments (cmd) with environment variables from env.
 func RunCmd(cmd, env []string) (returnCode int) {
 	// Place your code here
 	if len(cmd) == 0 {
