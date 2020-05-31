@@ -1,6 +1,5 @@
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/fdully/hw_otus v0.0.0-20200519070014-15701988a404 h1:qyrMzzWy/FDfTysSK8oIwSvLuw+VbWYtaG8u2Z80p7I=
 github.com/gojuno/genval v1.6.1 h1:1VZ1nBWEcczdUUs88nqLKn669zcETnccaMqWJd3+7q0=
 github.com/gojuno/genval v1.6.1/go.mod h1:YIWmptoavpvluIvDJW4zJ2i6qEjqthhfHyioDUfWHQY=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
