@@ -2,11 +2,12 @@ package vast
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 var testSrcAst = `
