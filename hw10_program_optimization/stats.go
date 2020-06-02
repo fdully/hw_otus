@@ -27,7 +27,6 @@ func GetDomainStat(r io.Reader, domain string) (DomainStat, error) {
 }
 
 func getUsers(r io.Reader, domain string) (DomainStat, error) {
-
 	var result = make(DomainStat, 1000)
 	var user User
 	reader := bufio.NewReader(r)
