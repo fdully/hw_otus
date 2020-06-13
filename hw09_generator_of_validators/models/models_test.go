@@ -64,6 +64,11 @@ func TestUserValidation(t *testing.T) {
 		u.Phones = []string{"79154557878", "79990004455"}
 
 		requireNoValidationErrors(t, u)
+
+		u.Phones = []string{"999000"}
+		errs, err := u.Validate()
+		require.NoError(t, err)
+		requireOneFieldErr(t, errs, "Phones")
 	})
 
 	t.Run("many errors", func(t *testing.T) {
