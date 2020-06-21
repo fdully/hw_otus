@@ -1,0 +1,25 @@
+
+### log levels
+# debug -1
+# info 0
+# warn 1
+# error 2
+
+log_file:
+  path: ${CAL_LOGFILE_PATH}
+  level: ${CAL_LOG_LEVEL}
+
+sql_db:
+  host: ${CAL_DB_HOST}
+  port: ${CAL_DB_PORT}
+  login: ${CAL_DB_LOGIN}
+  password: ${CAL_DB_PASSWORD}
+  database: ${CAL_DB_NAME}
+
+http_server:
+  address: ${CAL_HTTP_ADDRESS}
+  port: ${CAL_HTTP_PORT}
+
+storage:
+  sql: true
+  memory: false
