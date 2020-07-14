@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/calendar"
-
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/calendar/model"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"

@@ -5,19 +5,14 @@ import (
 	"errors"
 	"time"
 
-	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/util/timeutil"
-
-	"github.com/golang/protobuf/ptypes/empty"
-
-	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/calendar/model"
-
-	"github.com/golang/protobuf/ptypes"
-
-	"github.com/google/uuid"
-
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/calendar"
+	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/calendar/model"
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/logging"
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/pb"
+	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/util/timeutil"
+	"github.com/golang/protobuf/ptypes"
+	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

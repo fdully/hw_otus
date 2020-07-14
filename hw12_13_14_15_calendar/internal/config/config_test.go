@@ -2,9 +2,10 @@ package config
 
 import (
 	"context"
-	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestConfig(t *testing.T) {

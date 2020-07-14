@@ -71,7 +71,7 @@ jobs:
       name: "Makefile"
       install:
         - go mod download
-        - go get github.com/golangci/golangci-lint/cmd/golangci-lint@1.27.0
+        - go install github.com/golangci/golangci-lint/cmd/golangci-lint
       script:
         - make lint
         - make test

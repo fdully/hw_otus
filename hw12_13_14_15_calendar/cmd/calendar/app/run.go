@@ -8,13 +8,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/calendar"
-
-	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/config"
-	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/logging"
-
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/api"
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/api/swaggerui"
+	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/calendar"
+	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/config"
+	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/logging"
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/pb"
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/repository/memory"
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/repository/sqldb"

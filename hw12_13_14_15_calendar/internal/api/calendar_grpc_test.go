@@ -5,18 +5,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/empty"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/calendar"
-
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/api"
+	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/calendar"
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/pb"
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/repository/memory"
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func TestCalendarGRPCApi(t *testing.T) {
