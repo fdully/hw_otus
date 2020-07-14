@@ -17,9 +17,12 @@ sql_db:
   database: ${CAL_DB_NAME}
 
 http_server:
-  address: ${CAL_HTTP_ADDRESS}
+  host: ${CAL_HTTP_HOST}
   port: ${CAL_HTTP_PORT}
 
 storage:
   sql: true
-  memory: false
+
+grpc_server:
+  host: ${CAL_GRPC_HOST}
+  port: ${CAL_GRPC_PORT}

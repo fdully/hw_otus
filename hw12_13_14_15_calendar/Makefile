@@ -2,7 +2,7 @@ build:
 	go build -o calendar ./cmd/calendar/main.go
 
 test:
-	go test -race ./... -count=1
+	go test -v -race ./... -count=1
 
 lint:
 	golangci-lint run ./...
@@ -10,10 +10,18 @@ lint:
 run:
 	go run ./cmd/calendar/main.go -config ./configs/config.yaml
 
-migrate_up:
+migrateup:
 	goose -dir migrations postgres "user=${CAL_DB_LOGIN} password=${CAL_DB_PASSWORD} dbname=${CAL_DB_NAME} sslmode=disable" up
 
-migrate_down:
+migratedown:
 	goose -dir migrations postgres "user=${CAL_DB_LOGIN} password=${CAL_DB_PASSWORD} dbname=${CAL_DB_NAME} sslmode=disable" down
 
-.PHONY: build
+generate:
+	go generate proto/gen.go
+
+clean:
+	rm -rf internal/pb/*
+	rm -rf internal/api/swaggerui/statik/*
+	rm -rf swaggerui/calendar/*.json
+
+.PHONY: build proto

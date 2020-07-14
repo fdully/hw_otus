@@ -13,12 +13,12 @@ type Configuration struct {
 	LogFile    LogFile
 	SQLDB      SQLDB
 	HTTPServer HTTPServer
+	GRPCServer GRPCServer
 	Storage    Storage
 }
 
 type Storage struct {
-	SQL    bool
-	Memory bool
+	SQL bool
 }
 
 type SQLDB struct {
@@ -35,8 +35,13 @@ type LogFile struct {
 }
 
 type HTTPServer struct {
-	Address string
-	Port    int
+	Host string
+	Port int
+}
+
+type GRPCServer struct {
+	Host string
+	Port int
 }
 
 type configKey struct{}
@@ -52,9 +57,6 @@ func InitConfig(r io.Reader) error {
 	if err := provider.Get("storage").Populate(&c.Storage); err != nil {
 		return fmt.Errorf("ERROR: parsing storage config %w", err)
 	}
-	if (c.Storage.SQL && c.Storage.Memory) || (!c.Storage.Memory && !c.Storage.SQL) {
-		return fmt.Errorf("please define correct storage. It must be either memory or sql. It can't be both true or both false")
-	}
 
 	if err := provider.Get("log_file").Populate(&c.LogFile); err != nil {
 		return fmt.Errorf("ERROR: parsing log_file config %w", err)
@@ -68,6 +70,10 @@ func InitConfig(r io.Reader) error {
 
 	if err := provider.Get("http_server").Populate(&c.HTTPServer); err != nil {
 		return fmt.Errorf("ERROR: parsing http_server config %w", err)
+	}
+
+	if err := provider.Get("grpc_server").Populate(&c.GRPCServer); err != nil {
+		return fmt.Errorf("ERROR: parsing grpc_server config %w", err)
 	}
 
 	return nil

@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+
+option go_package = ".;pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+message Event {
+  string ID  = 1;
+  string subject = 2;
+  string description = 3;
+  google.protobuf.Timestamp start = 4;
+  google.protobuf.Timestamp end = 5;
+  string OwnerID = 6;
+  google.protobuf.Duration notify_period = 7;
+}
+
+message CreateEventRequest { Event event = 1; }
+message CreateEventResponse { string id = 1; }
+
+message UpdateEventRequest { Event event = 1; }
+message UpdateEventResponse { string id = 1; }
+
+message DeleteEventRequest { string id = 1; }
+
+message GetEventRequest { string id = 1; }
+message GetEventResponse { Event event = 1; }
+
+message GetEventsResponse {
+  repeated Event events = 1;
+}
+
+service CalendarService {
+  rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/event/create"
+      body: "*"
+    };
+  };
+
+  rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/event/update"
+      body: "*"
+    };
+  };
+
+  rpc DeleteEvent(DeleteEventRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/event/delete"
+      body: "*"
+    };
+  };
+
+  rpc GetEventsForToday(google.protobuf.Empty) returns (GetEventsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/event/today"
+    };
+  };
+
+  rpc GetEventsForWeek(google.protobuf.Empty) returns (GetEventsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/event/week"
+    };
+  };
+
+  rpc GetEventsForMonth(google.protobuf.Empty) returns (GetEventsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/event/month"
+    };
+  };
+
+  rpc GetEvent(GetEventRequest) returns (GetEventResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/event"
+    };
+  };
+}
