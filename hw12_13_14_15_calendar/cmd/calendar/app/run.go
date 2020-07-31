@@ -26,7 +26,7 @@ func RunCalendar(ctx context.Context) {
 	logger := logging.FromContext(ctx)
 	conf := config.FromContext(ctx)
 
-	lsn, err := net.Listen("tcp", buildAddr(ctx, conf.GRPCServer.Host, conf.GRPCServer.Port))
+	lsn, err := net.Listen("tcp", buildAddr(conf.GRPCServer.Host, conf.GRPCServer.Port))
 	if err != nil {
 		logger.Fatal("can't create grpc listener", err)
 	}
@@ -63,7 +63,7 @@ func RunCalendar(ctx context.Context) {
 	mux.Handle("/", wu.LogHTTPRequests(calendar.PreMuxRouter(grpcGWwMux)))
 	mux.Handle("/swaggerui/", wu.LogHTTPRequests(http.StripPrefix("/swaggerui/", swaggerui.NewHandler(ctx))))
 
-	webServer := wu.NewWebServer(mux, buildAddr(ctx, conf.HTTPServer.Host, conf.HTTPServer.Port))
+	webServer := wu.NewWebServer(mux, buildAddr(conf.HTTPServer.Host, conf.HTTPServer.Port))
 	closer.Bind(func() {
 		logger.Info("stopping web server")
 		if err := webServer.Shutdown(time.Second * 2); err != nil {
@@ -102,6 +102,6 @@ func defineRepository(ctx context.Context) calendar.Repository {
 	return repo
 }
 
-func buildAddr(ctx context.Context, host string, port int) string {
+func buildAddr(host string, port int) string {
 	return host + ":" + strconv.Itoa(port)
 }
