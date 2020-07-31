@@ -122,6 +122,15 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "searchWithTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
         "tags": [
           "CalendarService"
         ]
@@ -144,6 +153,15 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "searchWithTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
         "tags": [
           "CalendarService"
         ]
@@ -198,6 +216,15 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "searchWithTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
         "tags": [
           "CalendarService"
         ]

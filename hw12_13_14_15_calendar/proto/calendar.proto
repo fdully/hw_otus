@@ -29,6 +29,7 @@ message DeleteEventRequest { string id = 1; }
 message GetEventRequest { string id = 1; }
 message GetEventResponse { Event event = 1; }
 
+message GetEventsForPeriodRequest { google.protobuf.Timestamp search_with_time = 1; }
 message GetEventsResponse {
   repeated Event events = 1;
 }
@@ -55,19 +56,19 @@ service CalendarService {
     };
   };
 
-  rpc GetEventsForToday(google.protobuf.Empty) returns (GetEventsResponse) {
+  rpc GetEventsForToday(GetEventsForPeriodRequest) returns (GetEventsResponse) {
     option (google.api.http) = {
       get: "/api/v1/event/today"
     };
   };
 
-  rpc GetEventsForWeek(google.protobuf.Empty) returns (GetEventsResponse) {
+  rpc GetEventsForWeek(GetEventsForPeriodRequest) returns (GetEventsResponse) {
     option (google.api.http) = {
       get: "/api/v1/event/week"
     };
   };
 
-  rpc GetEventsForMonth(google.protobuf.Empty) returns (GetEventsResponse) {
+  rpc GetEventsForMonth(GetEventsForPeriodRequest) returns (GetEventsResponse) {
     option (google.api.http) = {
       get: "/api/v1/event/month"
     };

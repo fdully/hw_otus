@@ -18,11 +18,11 @@ import (
 )
 
 type CalGRPCApi struct {
-	r calendar.Repository
+	cc *calendar.Calendar
 }
 
-func NewCalendarGRPCApi(r calendar.Repository) CalGRPCApi {
-	return CalGRPCApi{r}
+func NewCalendarGRPCApi(cc *calendar.Calendar) CalGRPCApi {
+	return CalGRPCApi{cc}
 }
 
 func (c CalGRPCApi) CreateEvent(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
@@ -40,7 +40,7 @@ func (c CalGRPCApi) CreateEvent(ctx context.Context, req *pb.CreateEventRequest)
 	}
 
 	// adding new event to repository
-	err = c.r.AddEvent(ctx, event)
+	err = c.cc.AddEvent(ctx, event)
 	if err != nil {
 		code := codes.Internal
 		if errors.Is(err, model.ErrAlreadyExist) {
@@ -69,7 +69,7 @@ func (c CalGRPCApi) UpdateEvent(ctx context.Context, req *pb.UpdateEventRequest)
 	}
 
 	// upserting event in repository
-	err = c.r.UpdateEvent(ctx, event)
+	err = c.cc.UpdateEvent(ctx, event)
 	if err != nil {
 		logger.Error("upserting event in storage: ", err)
 		return nil, status.Errorf(codes.Internal, "can't upsert event: %v", err)
@@ -92,7 +92,7 @@ func (c CalGRPCApi) DeleteEvent(ctx context.Context, req *pb.DeleteEventRequest)
 		return nil, status.Errorf(codes.InvalidArgument, "id is not a valid UUID: %v", err)
 	}
 
-	err = c.r.DeleteEvent(ctx, id)
+	err = c.cc.DeleteEvent(ctx, id)
 	if err != nil {
 		logger.Errorf("can't delete event %v", err)
 		return nil, status.Errorf(codes.Internal, "can't delete event %v", err)
@@ -113,7 +113,7 @@ func (c CalGRPCApi) GetEvent(ctx context.Context, req *pb.GetEventRequest) (*pb.
 		return nil, status.Errorf(codes.InvalidArgument, "id is not a valid UUID: %v", err)
 	}
 
-	event, err := c.r.GetEvent(ctx, id)
+	event, err := c.cc.GetEvent(ctx, id)
 	if err != nil {
 		logger.Errorf("can't get event from repository %v", err)
 		return nil, status.Errorf(codes.Internal, "can't get event %v", err)
@@ -145,8 +145,15 @@ func (c CalGRPCApi) GetEvent(ctx context.Context, req *pb.GetEventRequest) (*pb.
 	}, nil
 }
 
-func (c CalGRPCApi) GetEventsForToday(ctx context.Context, req *empty.Empty) (*pb.GetEventsResponse, error) {
-	now := time.Now()
+func (c CalGRPCApi) GetEventsForToday(ctx context.Context, req *pb.GetEventsForPeriodRequest) (*pb.GetEventsResponse, error) {
+	logger := logging.FromContext(ctx)
+
+	now, err := ptypes.Timestamp(req.GetSearchWithTime())
+	if err != nil {
+		logger.Errorf("bad request search time: %v", err)
+		return nil, status.Error(codes.InvalidArgument, "bad search time provided")
+	}
+
 	start := timeutil.Bod(now)
 	end := timeutil.Eod(now)
 
@@ -158,8 +165,15 @@ func (c CalGRPCApi) GetEventsForToday(ctx context.Context, req *empty.Empty) (*p
 	return &pb.GetEventsResponse{Events: resEvents}, nil
 }
 
-func (c CalGRPCApi) GetEventsForWeek(ctx context.Context, req *empty.Empty) (*pb.GetEventsResponse, error) {
-	now := time.Now()
+func (c CalGRPCApi) GetEventsForWeek(ctx context.Context, req *pb.GetEventsForPeriodRequest) (*pb.GetEventsResponse, error) {
+	logger := logging.FromContext(ctx)
+
+	now, err := ptypes.Timestamp(req.GetSearchWithTime())
+	if err != nil {
+		logger.Errorf("bad request search time: %v", err)
+		return nil, status.Error(codes.InvalidArgument, "bad search time provided")
+	}
+
 	start := timeutil.Bow(now)
 	end := timeutil.Eow(now)
 
@@ -171,8 +185,15 @@ func (c CalGRPCApi) GetEventsForWeek(ctx context.Context, req *empty.Empty) (*pb
 	return &pb.GetEventsResponse{Events: resEvents}, nil
 }
 
-func (c CalGRPCApi) GetEventsForMonth(ctx context.Context, req *empty.Empty) (*pb.GetEventsResponse, error) {
-	now := time.Now()
+func (c CalGRPCApi) GetEventsForMonth(ctx context.Context, req *pb.GetEventsForPeriodRequest) (*pb.GetEventsResponse, error) {
+	logger := logging.FromContext(ctx)
+
+	now, err := ptypes.Timestamp(req.GetSearchWithTime())
+	if err != nil {
+		logger.Errorf("bad request search time: %v", err)
+		return nil, status.Error(codes.InvalidArgument, "bad search time provided")
+	}
+
 	start := timeutil.Bom(now)
 	end := timeutil.Eom(now)
 
@@ -240,7 +261,7 @@ func validateRequestAndCreateEvent(ev *pb.Event) (model.Event, error) {
 
 func (c CalGRPCApi) getEventsForPeriod(ctx context.Context, start, end time.Time) ([]*pb.Event, error) {
 	logger := logging.FromContext(ctx)
-	events, err := c.r.GetEventsForPeriod(ctx, start, end)
+	events, err := c.cc.GetEventsForPeriod(ctx, start, end)
 	if err != nil {
 		logger.Errorf("can't get events from repository %v", err)
 		return nil, status.Errorf(codes.Internal, "can't get events %v", err)

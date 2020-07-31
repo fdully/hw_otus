@@ -4,11 +4,18 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/config"
+
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-func OpenDB(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
+func OpenDB(ctx context.Context) (*pgxpool.Pool, error) {
+	conf := config.FromContext(ctx)
+
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		conf.SQLDB.Host, conf.SQLDB.Port, conf.SQLDB.Login, conf.SQLDB.Password, conf.SQLDB.Database)
+
 	conn, err := pgxpool.Connect(ctx, dsn)
 	if err != nil {
 		return nil, fmt.Errorf("error on connecting to sql db %w", err)

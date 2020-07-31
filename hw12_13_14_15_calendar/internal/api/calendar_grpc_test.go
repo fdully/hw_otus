@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
+
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/api"
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/calendar"
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/pb"
@@ -20,7 +22,8 @@ func TestCalendarGRPCApi(t *testing.T) {
 	ctx := context.Background()
 
 	m := memory.NewRepo()
-	a := api.NewCalendarGRPCApi(m)
+	cc := calendar.NewCalendar(m)
+	a := api.NewCalendarGRPCApi(cc)
 
 	event := calendar.CreateEvent(uuid.New(), "Test Subject", "Test Description", time.Now(), time.Now().Add(5*time.Minute), "Test Owner", time.Minute)
 	pbEvent := api.MakeProtoEvent(&event)
@@ -93,7 +96,7 @@ func TestCalendarGRPCApi(t *testing.T) {
 	})
 
 	t.Run("get events for period", func(t *testing.T) {
-		req := &empty.Empty{}
+		req := &pb.GetEventsForPeriodRequest{SearchWithTime: ptypes.TimestampNow()}
 		resp, err := a.GetEventsForToday(ctx, req)
 		require.NoError(t, err)
 

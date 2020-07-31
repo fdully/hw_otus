@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"net/http"
 	"strconv"
@@ -27,13 +26,16 @@ func RunCalendar(ctx context.Context) {
 	logger := logging.FromContext(ctx)
 	conf := config.FromContext(ctx)
 
-	lsn, err := net.Listen("tcp", conf.GRPCServer.Host+":"+strconv.Itoa(conf.GRPCServer.Port))
+	lsn, err := net.Listen("tcp", buildAddr(ctx, conf.GRPCServer.Host, conf.GRPCServer.Port))
 	if err != nil {
 		logger.Fatal("can't create grpc listener", err)
 	}
 
+	repo := defineRepository(ctx)
+	cc := calendar.NewCalendar(repo)
+
 	grpcGWwMux := runtime.NewServeMux()
-	a := api.NewCalendarGRPCApi(defineRepository(ctx))
+	a := api.NewCalendarGRPCApi(cc)
 
 	// registering grpc api
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(grpcutil.UnaryInterceptor()))
@@ -61,7 +63,7 @@ func RunCalendar(ctx context.Context) {
 	mux.Handle("/", wu.LogHTTPRequests(calendar.PreMuxRouter(grpcGWwMux)))
 	mux.Handle("/swaggerui/", wu.LogHTTPRequests(http.StripPrefix("/swaggerui/", swaggerui.NewHandler(ctx))))
 
-	webServer := wu.NewWebServer(mux, conf.HTTPServer.Host+":"+strconv.Itoa(conf.HTTPServer.Port))
+	webServer := wu.NewWebServer(mux, buildAddr(ctx, conf.HTTPServer.Host, conf.HTTPServer.Port))
 	closer.Bind(func() {
 		logger.Info("stopping web server")
 		if err := webServer.Shutdown(time.Second * 2); err != nil {
@@ -83,8 +85,7 @@ func defineRepository(ctx context.Context) calendar.Repository {
 	var repo calendar.Repository
 
 	if conf.Storage.SQL {
-		sqlPool, err := sqldb.OpenDB(ctx, fmt.Sprintf("host=%s port=%d user=%s "+
-			"password=%s dbname=%s sslmode=disable", conf.SQLDB.Host, conf.SQLDB.Port, conf.SQLDB.Login, conf.SQLDB.Password, conf.SQLDB.Database))
+		sqlPool, err := sqldb.OpenDB(ctx)
 		if err != nil {
 			logger.Fatal("connecting to sql db", err)
 		}
@@ -99,4 +100,8 @@ func defineRepository(ctx context.Context) calendar.Repository {
 	}
 
 	return repo
+}
+
+func buildAddr(ctx context.Context, host string, port int) string {
+	return host + ":" + strconv.Itoa(port)
 }
