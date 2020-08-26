@@ -19,6 +19,10 @@ migratedown:
 generate:
 	go generate proto/gen.go
 
+integration-tests:
+	docker-compose -f ./docker-compose-tests.yaml up --build --abort-on-container-exit --exit-code-from integration_tests && \
+	docker-compose -f ./docker-compose-tests.yaml down
+
 clean:
 	rm -rf internal/pb/*
 	rm -rf internal/api/swaggerui/statik/*

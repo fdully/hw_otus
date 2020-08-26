@@ -3,7 +3,7 @@ FROM golang:1.14.4
 LABEL maintainer="Fdully <fdully@gmail.com>"
 
 # Build Args
-ARG APP_NAME=Calendar
+ARG APP_NAME=Sender
 
 # Environment Variables
 ENV GO111MODULE=on
@@ -28,7 +28,7 @@ RUN go mod download
 COPY . .
 
 # Build the binary.
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/calendar cmd/calendar/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/sender cmd/sender/main.go
 
 # Run the binary.
-CMD ["/go/bin/calendar"]
+CMD ["/go/bin/sender"]

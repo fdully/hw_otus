@@ -39,6 +39,7 @@ func (r Repo) AddEvent(ctx context.Context, e model.Event) error {
 	if result.RowsAffected() != 1 {
 		return fmt.Errorf("no rows updated")
 	}
+
 	return nil
 }
 
@@ -59,6 +60,7 @@ func (r Repo) UpdateEvent(ctx context.Context, e model.Event) error {
 		if err != nil {
 			return fmt.Errorf("can't upsert event: %w", err)
 		}
+
 		return nil
 	})
 }
@@ -83,6 +85,7 @@ func (r Repo) DeleteEvent(ctx context.Context, eventID uuid.UUID) error {
 	if result.RowsAffected() != 1 {
 		return fmt.Errorf("no rows updated")
 	}
+
 	return nil
 }
 
@@ -107,8 +110,10 @@ func (r Repo) GetEvent(ctx context.Context, id uuid.UUID) (*model.Event, error) 
 		if err == model.ErrNotExist {
 			return nil, model.ErrNotExist
 		}
+
 		return nil, fmt.Errorf("scanning results: %w", err)
 	}
+
 	return res, nil
 }
 
@@ -143,6 +148,7 @@ func (r Repo) GetEventsForPeriod(ctx context.Context, start, end time.Time) ([]*
 			if errors.Is(model.ErrNotExist, err) {
 				return nil, model.ErrNotExist
 			}
+
 			return nil, fmt.Errorf("scaning rows: %w", err)
 		}
 		results = append(results, e)
@@ -159,7 +165,9 @@ func scanOneEvent(row pgx.Row) (*model.Event, error) {
 		if errors.Is(pgx.ErrNoRows, err) {
 			return nil, model.ErrNotExist
 		}
+
 		return nil, err
 	}
+
 	return &m, nil
 }

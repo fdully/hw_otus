@@ -12,7 +12,7 @@ log_file:
 sql_db:
   host: ${CAL_DB_HOST}
   port: ${CAL_DB_PORT}
-  login: ${CAL_DB_LOGIN}
+  login: ${CAL_DB_USER}
   password: ${CAL_DB_PASSWORD}
   database: ${CAL_DB_NAME}
 
@@ -26,3 +26,9 @@ storage:
 grpc_server:
   host: ${CAL_GRPC_HOST}
   port: ${CAL_GRPC_PORT}
+
+amqp:
+  url: ${CAL_Q_URL}
+  exchange: ""
+  name: ${CAL_Q_QUEUE}
+  qos: 1

@@ -15,6 +15,7 @@ type Configuration struct {
 	HTTPServer HTTPServer
 	GRPCServer GRPCServer
 	Storage    Storage
+	AMQP       AMQP
 }
 
 type Storage struct {
@@ -42,6 +43,13 @@ type HTTPServer struct {
 type GRPCServer struct {
 	Host string
 	Port int
+}
+
+type AMQP struct {
+	URL      string
+	Name     string
+	Exchange string
+	QOS      int
 }
 
 type configKey struct{}
@@ -76,6 +84,10 @@ func InitConfig(r io.Reader) error {
 		return fmt.Errorf("ERROR: parsing grpc_server config %w", err)
 	}
 
+	if err := provider.Get("amqp").Populate(&c.AMQP); err != nil {
+		return fmt.Errorf("ERROR: parsing amqp config %w", err)
+	}
+
 	return nil
 }
 
@@ -87,5 +99,6 @@ func FromContext(ctx context.Context) *Configuration {
 	if conf, ok := ctx.Value(configKey{}).(*Configuration); ok {
 		return conf
 	}
+
 	return &c
 }

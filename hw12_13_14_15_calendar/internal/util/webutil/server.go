@@ -19,6 +19,7 @@ func NewWebServer(handler http.Handler, listenAddress string) *WebServer {
 		IdleTimeout:       1 * time.Minute,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
+
 	return &WebServer{server: server}
 }
 
@@ -27,11 +28,13 @@ func (s WebServer) Start() error {
 	if err == http.ErrServerClosed {
 		return nil
 	}
+
 	return err
 }
 
 func (s WebServer) Shutdown(timeout time.Duration) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
+
 	return s.server.Shutdown(ctx)
 }

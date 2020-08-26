@@ -45,6 +45,7 @@ func (w *MyResponseWriter) Write(p []byte) (n int, err error) {
 	if !w.wroteHeader {
 		w.WriteHeader(http.StatusOK)
 	}
+
 	return w.ResponseWriter.Write(p)
 }
 

@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/config"
-
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -20,6 +19,7 @@ func OpenDB(ctx context.Context) (*pgxpool.Pool, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error on connecting to sql db %w", err)
 	}
+
 	return conn, nil
 }
 
@@ -40,11 +40,13 @@ func (r Repo) InTx(ctx context.Context, isoLevel pgx.TxIsoLevel, f func(tx pgx.T
 		if err1 := tx.Rollback(ctx); err1 != nil {
 			return fmt.Errorf("rolling back transaction: %v (original error: %v)", err1, err)
 		}
+
 		return err
 	}
 
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("committing transaction: %v", err)
 	}
+
 	return nil
 }

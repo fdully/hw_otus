@@ -1,0 +1,86 @@
+version: '3.7'
+
+services:
+
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    env_file:
+      - tests/database.env
+
+  migration:
+    build:
+      context: .
+      dockerfile: tests/migration.dockerfile
+    env_file:
+      - tests/database.env
+    depends_on:
+      - postgres
+    command: sh -c 'dockerize -wait tcp://postgres:5432 -- /go/bin/goose -dir /app/migrations postgres "host=postgres port=5432 user=calendar password=calendar dbname=calendar sslmode=disable" up && sleep 180'
+
+  calendar:
+    build:
+      context: .
+      dockerfile: build/calendar.dockerfile
+    ports:
+      - "8080:8080"
+      - "9111:9111"
+    env_file:
+      - build/calendar.env
+    environment:
+      - CAL_DB_HOST=postgres
+    depends_on:
+      - postgres
+    command: sh -c 'dockerize -wait tcp://postgres:5432 -- /go/bin/calendar -config configs/config.yaml'
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: build/scheduler.dockerfile
+    env_file:
+      - build/calendar.env
+    environment:
+      - CAL_DB_HOST=postgres
+    depends_on:
+      - postgres
+      - calendar
+      - rabbit
+    command: sh -c 'dockerize -wait tcp://rabbit:5672 -timeout 60s -- /go/bin/scheduler -config configs/config.yaml'
+
+  sender:
+    build:
+      context: .
+      dockerfile: build/sender.dockerfile
+    env_file:
+      - build/calendar.env
+    depends_on:
+      - rabbit
+    command: sh -c 'dockerize -wait tcp://rabbit:5672 -timeout 60s -- /go/bin/sender -config configs/config.yaml'
+
+  rabbit:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15677:15672"
+    environment:
+      RABBITMQ_DEFAULT_PASS: calendar
+      RABBITMQ_DEFAULT_USER: calendar
+
+  integration_tests:
+    build:
+      context: .
+      dockerfile: tests/integration_tests.dockerfile
+    depends_on:
+      - postgres
+      - migration
+      - rabbit
+      - calendar
+      - scheduler
+    env_file:
+      - build/calendar.env
+    environment:
+      - CAL_DB_HOST=postgres
+      - CAL_Q_URL=amqp://calendar:calendar@rabbit/
+      - CAL_Q_QUEUE=calendar
+    command: sh -c 'dockerize -wait tcp://rabbit:5672 -timeout 60s -- go test -v -tags integration ./tests/calendar_test.go'
