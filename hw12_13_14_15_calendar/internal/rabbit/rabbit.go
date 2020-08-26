@@ -62,12 +62,12 @@ func (c *connector) setupConn(ctx context.Context, url string) {
 	var err error
 	c.conn, err = amqp.Dial(url)
 	if err != nil {
-		logger.Errorf("Can't connect to AMQP: %w", err)
+		logger.Errorf("Can't connect to AMQP: %v", err)
 	}
 
 	c.channel, err = c.conn.Channel()
 	if err != nil {
-		logger.Errorf("Can't create a amqpChannel: %w", err)
+		logger.Errorf("Can't create a amqpChannel: %v", err)
 	}
 }
 
@@ -76,14 +76,14 @@ func (c *connector) declareQueue(ctx context.Context, name string) {
 	c.queue, err = c.channel.QueueDeclare(name, true, false, false, false, nil)
 	if err != nil {
 		logger := logging.FromContext(ctx)
-		logger.Errorf("Could not declare %s queue: %w", name, err)
+		logger.Errorf("Could not declare %s queue: %v", name, err)
 	}
 }
 
 func (c *connector) setupQOS(ctx context.Context, count int) {
 	if err := c.channel.Qos(count, 0, false); err != nil {
 		logger := logging.FromContext(ctx)
-		logger.Errorf("Could not configure QoS: %w", err)
+		logger.Errorf("Could not configure QoS: %v", err)
 	}
 }
 
@@ -101,7 +101,7 @@ func (c *connector) setupMsgCh(ctx context.Context) {
 
 	if err != nil {
 		logger := logging.FromContext(ctx)
-		logger.Errorf("Could not register consumer: %w", err)
+		logger.Errorf("Could not register consumer: %v", err)
 	}
 }
 

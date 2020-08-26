@@ -75,8 +75,12 @@ services:
       - postgres
       - migration
       - rabbit
+      - calendar
+      - scheduler
     env_file:
       - build/calendar.env
     environment:
       - CAL_DB_HOST=postgres
+      - CAL_Q_URL="amqp://calendar:calendar@rabbit/"
+      - CAL_Q_QUEUE=calendar
     command: sh -c 'dockerize -wait tcp://rabbit:5672 -timeout 30s -- go test -v -tags integration ./tests/calendar_test.go'
