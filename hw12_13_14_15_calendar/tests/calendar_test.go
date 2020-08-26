@@ -59,7 +59,7 @@ func TestCalendar(t *testing.T) {
 	defer q.Close()
 
 	go func(ctx context.Context, cancelFunc context.CancelFunc) {
-		time.Sleep(16 * time.Second)
+		time.Sleep(60 * time.Second)
 		cancel()
 	}(ctx, cancel)
 
