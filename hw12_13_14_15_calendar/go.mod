@@ -3,6 +3,7 @@ module github.com/fdully/hw_otus/hw12_13_14_15_calendar
 go 1.14
 
 require (
+	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.0 // indirect
 	github.com/google/uuid v1.1.1
@@ -12,6 +13,8 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rakyll/statik v0.1.7
+	github.com/sethvargo/go-signalcontext v0.1.0
+	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.6.1
 	github.com/xlab/closer v0.0.0-20190328110542-03326addb7c2
 	go.uber.org/config v1.4.0

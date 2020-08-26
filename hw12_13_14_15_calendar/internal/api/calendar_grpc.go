@@ -31,6 +31,7 @@ func (c CalGRPCApi) CreateEvent(ctx context.Context, req *pb.CreateEventRequest)
 
 	if ev == nil {
 		logger.Info("event is nil")
+
 		return nil, status.Error(codes.InvalidArgument, "event must be provided")
 	}
 
@@ -48,10 +49,12 @@ func (c CalGRPCApi) CreateEvent(ctx context.Context, req *pb.CreateEventRequest)
 		}
 
 		logger.Error("adding new event to storage", err)
+
 		return nil, status.Errorf(code, "cannot add new event: %v", err)
 	}
 
 	res := &pb.CreateEventResponse{Id: ev.ID}
+
 	return res, nil
 }
 
@@ -60,6 +63,7 @@ func (c CalGRPCApi) UpdateEvent(ctx context.Context, req *pb.UpdateEventRequest)
 	ev := req.GetEvent()
 	if ev == nil {
 		logger.Info("event is nil")
+
 		return nil, status.Error(codes.InvalidArgument, "event must be provided")
 	}
 
@@ -72,10 +76,12 @@ func (c CalGRPCApi) UpdateEvent(ctx context.Context, req *pb.UpdateEventRequest)
 	err = c.cc.UpdateEvent(ctx, event)
 	if err != nil {
 		logger.Error("upserting event in storage: ", err)
+
 		return nil, status.Errorf(codes.Internal, "can't upsert event: %v", err)
 	}
 
 	res := &pb.UpdateEventResponse{Id: ev.ID}
+
 	return res, nil
 }
 
@@ -95,6 +101,7 @@ func (c CalGRPCApi) DeleteEvent(ctx context.Context, req *pb.DeleteEventRequest)
 	err = c.cc.DeleteEvent(ctx, id)
 	if err != nil {
 		logger.Errorf("can't delete event %v", err)
+
 		return nil, status.Errorf(codes.Internal, "can't delete event %v", err)
 	}
 
@@ -116,6 +123,7 @@ func (c CalGRPCApi) GetEvent(ctx context.Context, req *pb.GetEventRequest) (*pb.
 	event, err := c.cc.GetEvent(ctx, id)
 	if err != nil {
 		logger.Errorf("can't get event from repository %v", err)
+
 		return nil, status.Errorf(codes.Internal, "can't get event %v", err)
 	}
 
@@ -151,6 +159,7 @@ func (c CalGRPCApi) GetEventsForToday(ctx context.Context, req *pb.GetEventsForP
 	now, err := ptypes.Timestamp(req.GetSearchWithTime())
 	if err != nil {
 		logger.Errorf("bad request search time: %v", err)
+
 		return nil, status.Error(codes.InvalidArgument, "bad search time provided")
 	}
 
@@ -171,6 +180,7 @@ func (c CalGRPCApi) GetEventsForWeek(ctx context.Context, req *pb.GetEventsForPe
 	now, err := ptypes.Timestamp(req.GetSearchWithTime())
 	if err != nil {
 		logger.Errorf("bad request search time: %v", err)
+
 		return nil, status.Error(codes.InvalidArgument, "bad search time provided")
 	}
 
@@ -191,6 +201,7 @@ func (c CalGRPCApi) GetEventsForMonth(ctx context.Context, req *pb.GetEventsForP
 	now, err := ptypes.Timestamp(req.GetSearchWithTime())
 	if err != nil {
 		logger.Errorf("bad request search time: %v", err)
+
 		return nil, status.Error(codes.InvalidArgument, "bad search time provided")
 	}
 
@@ -213,13 +224,16 @@ func MakeProtoEvent(e *model.Event) *pb.Event {
 	start, err := ptypes.TimestampProto(e.Start)
 	if err != nil {
 		logger.Errorf("can't convert start time to proto timestamp event with id %s, %v", e.ID.String(), err)
+
 		return nil
 	}
 	end, err := ptypes.TimestampProto(e.End)
 	if err != nil {
 		logger.Errorf("can't convert end time to proto timestamp event with id %s, %v", e.ID.String(), err)
+
 		return nil
 	}
+
 	return &pb.Event{
 		ID:           e.ID.String(),
 		Subject:      e.Subject,
@@ -256,6 +270,7 @@ func validateRequestAndCreateEvent(ev *pb.Event) (model.Event, error) {
 	}
 
 	event = calendar.CreateEvent(id, ev.Subject, ev.Description, start, end, ev.OwnerID, notifyPeriod)
+
 	return event, nil
 }
 
@@ -264,6 +279,7 @@ func (c CalGRPCApi) getEventsForPeriod(ctx context.Context, start, end time.Time
 	events, err := c.cc.GetEventsForPeriod(ctx, start, end)
 	if err != nil {
 		logger.Errorf("can't get events from repository %v", err)
+
 		return nil, status.Errorf(codes.Internal, "can't get events %v", err)
 	}
 

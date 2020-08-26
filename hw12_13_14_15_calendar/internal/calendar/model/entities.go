@@ -7,11 +7,11 @@ import (
 )
 
 type Event struct {
-	ID           uuid.UUID
-	Subject      string
-	Description  string
-	Start        time.Time
-	End          time.Time
-	OwnerID      string
-	NotifyPeriod time.Duration
+	ID           uuid.UUID     `json:"id"`
+	Subject      string        `json:"subject"`
+	Description  string        `json:"description"`
+	Start        time.Time     `json:"start"`
+	End          time.Time     `json:"end"`
+	OwnerID      string        `json:"owner_id"`
+	NotifyPeriod time.Duration `json:"notify_period"`
 }

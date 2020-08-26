@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	// init static files for swagger ui
+	// init static files for swagger ui.
 	_ "github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/api/swaggerui/statik"
 	"github.com/fdully/hw_otus/hw12_13_14_15_calendar/internal/logging"
 	"github.com/rakyll/statik/fs"

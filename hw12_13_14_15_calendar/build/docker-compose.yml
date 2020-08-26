@@ -1,11 +1,22 @@
 version: '3.7'
+
 services:
+
   postgres:
     image: postgres
     ports:
       - 5432:5432
     environment:
-      POSTGRES_USER: ${CAL_DB_LOGIN}
+      POSTGRES_USER: ${CAL_DB_USER}
       POSTGRES_PASSWORD: ${CAL_DB_PASSWORD}
       POSTGRES_DB: ${CAL_DB_NAME}
+
+  rabbit:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15677:15672"
+    environment:
+      RABBITMQ_DEFAULT_PASS: calendar
+      RABBITMQ_DEFAULT_USER: calendar
 

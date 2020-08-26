@@ -34,6 +34,7 @@ func (r *repo) AddEvent(ctx context.Context, e model.Event) error {
 	}
 
 	r.s[e.ID] = &e
+
 	return nil
 }
 
@@ -49,10 +50,12 @@ func (r *repo) UpdateEvent(ctx context.Context, e model.Event) error {
 		r.s[e.ID].End = e.End
 		r.s[e.ID].OwnerID = e.OwnerID
 		r.s[e.ID].NotifyPeriod = e.NotifyPeriod
+
 		return nil
 	}
 
 	r.s[e.ID] = &e
+
 	return nil
 }
 
