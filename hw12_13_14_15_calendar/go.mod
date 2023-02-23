@@ -20,9 +20,7 @@ require (
 	go.uber.org/config v1.4.0
 	go.uber.org/zap v1.15.0
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
-	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae // indirect
-	golang.org/x/text v0.3.3 // indirect
-	golang.org/x/tools v0.0.0-20200713235242-6acd2ab80ede // indirect
+	golang.org/x/text v0.3.8 // indirect
 	google.golang.org/genproto v0.0.0-20200701001935-0939c5918c31
 	google.golang.org/grpc v1.30.0
 	google.golang.org/protobuf v1.24.0
